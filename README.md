@@ -1,4 +1,4 @@
-# Lista de tarefas — estágio
+# Lista de tarefas
 
 Aplicação web desenvolvida para um teste de estágio, com gerenciamento de tarefas e acompanhamento de conclusões.
 
