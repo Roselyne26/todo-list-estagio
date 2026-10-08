@@ -63,3 +63,6 @@ Os testes usam um substituto do banco para verificar o fluxo HTTP e os filtros e
 A IA gerou grande parte do código, ajudou na adaptação de hospedagem, documentação e verificações. Não apresentar o projeto como escrito sem assistência. Veja RELATO.md e GUIA-DE-ESTUDO.md.
 
 Referências: https://nextjs.org/docs | https://supabase.com/docs/guides/getting-started/api-keys | https://vercel.com/docs/frameworks/full-stack/nextjs
+
+## Acompanhamento da conclusão
+Novas tarefas começam pendentes. Use Concluir tarefa na aba A fazer. A aba Concluídas mostra data e hora no fuso do navegador e tempo corrido desde a criação. Editar não altera o status nem o registro de conclusão. Tarefas antigas sem data registrada não têm duração calculada. No projeto Roselyne, a atualização do banco já foi aplicada. Para instalar em outro banco existente, execute supabase/completion.sql uma vez.
