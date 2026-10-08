@@ -1,68 +1,128 @@
 # Lista de tarefas — estágio
 
-Aplicação web com cadastro, listagem, edição, exclusão e pesquisa. Campos: título, descrição, data prevista e status (Pendente ou Concluída).
+Aplicação web desenvolvida para um teste de estágio, com gerenciamento de tarefas e acompanhamento de conclusões.
+
+**Aplicação online:** [Acessar a lista de tarefas](https://todo-list-estagio-puce.vercel.app/)
+
+## Funcionalidades
+
+- Adicionar, listar, editar e excluir tarefas.
+- Pesquisar pelo título ou pela descrição, ignorando maiúsculas e acentos.
+- Separar tarefas nas abas **A fazer** e **Concluídas**, com contadores.
+- Marcar uma tarefa como concluída.
+- Consultar a data e a hora da conclusão e o tempo decorrido desde a criação.
+
+Cada tarefa contém título, descrição opcional, data prevista e status. Novas tarefas começam pendentes e são concluídas pelo botão **Concluir tarefa**.
+
+O título é obrigatório e deve ter até 120 caracteres. A data prevista precisa ser válida. Editar uma tarefa concluída preserva seu status e a data de conclusão.
 
 ## Tecnologias
 
-Next.js, React, TypeScript, CSS e Lucide. A API usa o runtime Node.js da Vercel. O banco é PostgreSQL no Supabase, acessado pela API REST com fetch no servidor. Desenvolvimento com apoio amplo de IA (Codex).
+- **Interface:** Next.js, React, TypeScript, CSS e Lucide.
+- **API:** rotas do Next.js executadas em Node.js.
+- **Banco de dados:** PostgreSQL no Supabase.
+- **Hospedagem:** Vercel.
 
-## Executar
+## Executar localmente
 
-Requer Node.js 22.13 ou superior.
+Requisito: Node.js 22.13 ou superior.
 
-1. Execute `npm ci`.
-2. Crie um projeto no Supabase e execute `supabase/schema.sql` no SQL Editor.
-3. Copie `.env.example` para `.env.local` e preencha `SUPABASE_URL` e `SUPABASE_SECRET_KEY` com os valores do seu projeto.
-4. Execute `npm run dev` e abra a URL local mostrada no terminal.
+1. Instale as dependências:
 
-Use a chave secret (`sb_secret_...`), exclusivamente no servidor. Não use chave publishable/anon neste projeto. A chave service_role legada também é aceita, mas a chave secret atual é preferida. Nunca envie `.env.local` ao GitHub e nunca prefixe a chave com NEXT_PUBLIC_.
+   ```bash
+   npm ci
+   ```
 
-## Publicar na Vercel
+2. Crie um projeto no Supabase e execute o arquivo `supabase/schema.sql` no SQL Editor.
 
-1. Envie este projeto para seu repositório GitHub, mantendo package.json na raiz.
-2. Na Vercel, importe o repositório e selecione Next.js.
-3. Configure as variáveis SUPABASE_URL e SUPABASE_SECRET_KEY na Vercel para Production. Configure Preview apenas se quiser que previews usem esse banco.
-4. Publique. Não precisa de configuração especial de build: npm run build produz o aplicativo Next.js.
-5. Configure o nome do projeto/domínio disponível em .vercel.app.
-6. Teste criar, editar, pesquisar, recarregar e excluir uma tarefa na publicação.
+3. Copie `.env.example` para `.env.local` e preencha as variáveis com os valores do seu projeto:
 
-A interface abre sem credenciais; a API retorna indisponibilidade até configurar o banco. A compilação não precisa de acesso ao Supabase. A aplicação só está pronta para avaliação online depois de configurar o banco e testar a publicação.
+   ```env
+   SUPABASE_URL=https://SEU-PROJETO.supabase.co
+   SUPABASE_SECRET_KEY=SUA_CHAVE_SECRET
+   ```
 
-## Organização
+   Use uma chave secret do Supabase, exclusivamente no servidor. Não envie `.env.local` ao GitHub nem use o prefixo `NEXT_PUBLIC_` na chave secreta.
 
-- app/page.tsx: interface, formulário e pesquisa.
-- app/api/tasks/route.ts: métodos HTTP da API Next.js.
-- lib/tasks-api.mjs: validação, sessão e respostas HTTP.
-- lib/task-store.mjs: consultas ao Supabase com filtro de proprietário.
-- lib/task-validation.mjs: regras compartilhadas pelo formulário e servidor.
-- supabase/schema.sql: tabela e controle de acesso no PostgreSQL.
-- tests/tasks.test.mjs: validações, API e contrato de consultas.
+4. Inicie a aplicação:
 
-## Decisões e limites
+   ```bash
+   npm run dev
+   ```
 
-Uma única tela reduz a complexidade. O título precisa ter texto e até 120 caracteres. A descrição é opcional. A data precisa existir no calendário; datas passadas são permitidas. O seletor de data é o componente nativo do navegador. A pesquisa ignora maiúsculas e acentos e procura título e descrição. Erros ao salvar preservam os campos. A exclusão pede confirmação.
+5. Abra o endereço local informado no terminal.
 
-Cada navegador recebe um identificador aleatório em cookie HttpOnly, SameSite=Lax e Secure em HTTPS. O servidor usa esse identificador em todas as consultas. As tarefas ficam no PostgreSQL. A tabela usa RLS e não permite acesso direto com chaves públicas: apenas a API, com a chave secret, acessa os registros.
+## Estrutura do projeto
 
-Não há cadastro de contas nem sincronização entre dispositivos. Limpar cookies remove o acesso à lista anterior, embora os registros permaneçam no banco. A API é pública para demonstração do teste e não tem cotas nem política automática de limpeza. Use um projeto Supabase dedicado a esta demonstração.
+- `app/page.tsx`: interface, formulário, pesquisa e acompanhamento das tarefas.
+- `app/globals.css`: estilos e adaptação para diferentes tamanhos de tela.
+- `app/api/tasks/route.ts`: rotas HTTP da API.
+- `lib/tasks-api.mjs`: validação das requisições, identificação da lista e respostas HTTP.
+- `lib/task-store.mjs`: consultas ao Supabase.
+- `lib/task-validation.mjs`: validações compartilhadas entre formulário e servidor.
+- `supabase/schema.sql`: estrutura e configuração do banco.
+- `supabase/completion.sql`: atualização para bancos existentes que ainda não registram a conclusão.
+- `tests/`: testes automatizados.
 
-A nova publicação começa com uma lista vazia. As tarefas da hospedagem anterior não são transferidas automaticamente.
+## Decisões técnicas
 
-## Verificar
+A interface reúne o formulário e a lista em uma única página. As abas organizam as tarefas por status, e a pesquisa considera o título e a descrição da aba selecionada.
 
-```sh
+O seletor de data utiliza o componente nativo do navegador. Datas passadas são permitidas, desde que sejam válidas. Erros ao salvar preservam os campos preenchidos, e a exclusão exige confirmação.
+
+Cada navegador recebe um identificador aleatório em cookie. A API utiliza esse identificador para consultar apenas as tarefas daquela lista. Os dados ficam armazenados no PostgreSQL.
+
+O acesso ao banco ocorre pelo servidor. A tabela utiliza Row Level Security (RLS) e não permite acesso direto com chaves públicas.
+
+## Conclusão e tempo decorrido
+
+Ao concluir uma tarefa, o banco registra automaticamente a data e a hora. A interface apresenta esse registro no fuso horário do navegador.
+
+O tempo exibido corresponde ao intervalo corrido entre a criação e a conclusão, incluindo noites e fins de semana. Ele não representa as horas efetivamente trabalhadas.
+
+Tarefas concluídas antes da inclusão desse recurso não possuem uma data de conclusão registrada e, por isso, não apresentam uma duração calculada.
+
+## Limitações
+
+A aplicação não possui cadastro de usuários nem sincronização entre dispositivos. Cada navegador mantém sua própria lista.
+
+Limpar os cookies faz o navegador perder o acesso à lista anterior, embora os registros permaneçam no banco.
+
+A aplicação foi desenvolvida como demonstração para o teste e não possui limitação de requisições nem limpeza automática de registros.
+
+## Verificações
+
+Execute os comandos abaixo para verificar testes, tipos e compilação:
+
+```bash
 npm test
 npm run check
 npm run build
 ```
 
-Os testes usam um substituto do banco para verificar o fluxo HTTP e os filtros enviados ao Supabase. Eles não comprovam que um projeto Supabase remoto está configurado; a publicação precisa de um teste real após conectar o banco.
+Os testes automatizados verificam validações, operações da API, identificação da lista, conclusão de tarefas e tratamento de falhas.
 
-## Uso de IA
+Os testes de acesso ao banco utilizam respostas simuladas. Para verificar a integração real, é necessário configurar o Supabase e testar as operações na aplicação.
 
-A IA gerou grande parte do código, ajudou na adaptação de hospedagem, documentação e verificações. Não apresentar o projeto como escrito sem assistência. Veja RELATO.md e GUIA-DE-ESTUDO.md.
+## Publicação na Vercel
 
-Referências: https://nextjs.org/docs | https://supabase.com/docs/guides/getting-started/api-keys | https://vercel.com/docs/frameworks/full-stack/nextjs
+1. Importe o repositório na Vercel.
+2. Selecione o framework **Next.js**.
+3. Configure o diretório raiz para a pasta que contém `package.json`.
+4. Adicione as variáveis `SUPABASE_URL` e `SUPABASE_SECRET_KEY` no ambiente de produção.
+5. Execute o deploy.
+6. Abra o domínio de produção e teste as funcionalidades.
 
-## Acompanhamento da conclusão
-Novas tarefas começam pendentes. Use Concluir tarefa na aba A fazer. A aba Concluídas mostra data e hora no fuso do navegador e tempo corrido desde a criação. Editar não altera o status nem o registro de conclusão. Tarefas antigas sem data registrada não têm duração calculada. No projeto Roselyne, a atualização do banco já foi aplicada. Para instalar em outro banco existente, execute supabase/completion.sql uma vez.
+Se alterar as variáveis de ambiente após a publicação, faça um novo deploy para aplicar os novos valores.
+
+## Uso de inteligência artificial
+
+O projeto foi desenvolvido com apoio amplo do ChatGPT/Codex na organização, geração do código, documentação, testes e correção de problemas.
+
+Minha participação incluiu a definição do comportamento da aplicação, revisão da interface e configuração da publicação. Minha experiência prática com programação ainda está em desenvolvimento, e o projeto também fez parte desse processo de aprendizado.
+
+## Referências
+
+- [Documentação do Next.js](https://nextjs.org/docs)
+- [Documentação de chaves do Supabase](https://supabase.com/docs/guides/getting-started/api-keys)
+- [Documentação de Next.js na Vercel](https://vercel.com/docs/frameworks/full-stack/nextjs)
